@@ -6,21 +6,10 @@
 #include <sys/wait.h>
 #define CONFIG_FILE ./webserv.conf
 
-void sigquit(int sig)
-{
-	void(sig);
-}
-
-void sigint(int sig)
-{
-	void(sig);
-}
-
 int main()
 {
 	std::vector<Server> servers = parse(CONFIG_FILE);
 	std::vector<Server>::iterator it = servers.begin();
-	signal(SIGINT, SIG_IGN);
 	while(it != servers.end())
 	{
 		int pid = fork();
@@ -28,8 +17,6 @@ int main()
 			exit(3);
 		else if (pid == 0)
 		{
-			signal(SIGQUIT, sigquit);
-			signal(SIGINT, sigint);
 			Socket(*it);
 		}
 		else
