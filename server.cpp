@@ -4,7 +4,7 @@ int main()
 {
 	try
 	{
-		Sercer webserv("127.0.0.1", 8080);
+		Server webserv("127.0.0.1", 8080);
 	}
 	catch(std::excepiton &e)
 	{

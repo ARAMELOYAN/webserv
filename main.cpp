@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Server.hpp>
+#include <Config.hpp>
 #include <vector>
 #include <signal>
 #include <sys/types.h>
@@ -8,19 +9,19 @@
 
 int main()
 {
-	std::vector<Server> servers = parse(CONFIG_FILE);
-	std::vector<Server>::iterator it = servers.begin();
-	while(it != servers.end())
+	std::vector<Config> configs = Config::parse(CONFIG_FILE);
+	std::vector<Config>::iterator conf = configs.begin();
+	while(conf != configs.end())
 	{
 		int pid = fork();
 		if (pid == -1)
 			exit(3);
 		else if (pid == 0)
 		{
-			Socket(*it);
+			Server(*conf);
 		}
 		else
-			++it;
+			++conf;
 	}
 	while (true)
 	{

@@ -31,7 +31,6 @@ int main(void)
 	int fd_max;
 	struct timeval timer;
 
-	timer.tv_sec = 2;
 	FD_ZERO(&all_sockets);
 	FD_ZERO(&read_fds);
 	printf("---- SERVER ----\n\n");
@@ -48,14 +47,9 @@ int main(void)
 	while (1)
 	{
 		read_fds = all_sockets;
-		status = select(fd_max + 1, &read_fds, NULL, NULL, &timer);
+		status = select(fd_max + 1, &read_fds, NULL, NULL, NULL);
 		if (status == -1)
 			exit(1);
-		else if (status == 0)
-		{
-			printf("[Server] Waiting...\n");
-			continue ;
-		}
 		printf(RED"STATUS____%d\n"RESET, status);
 		for (int i = 0; i <= fd_max; i++)
 		{
@@ -63,8 +57,6 @@ int main(void)
 				continue ;
 			if (i == server_socket)
 				accept_new_connection(server_socket, &all_sockets, &fd_max);
-			else 
-				read_data_from_socket(i, &all_sockets, fd_max, server_socket);
 		}
 	}
 	return (0);
@@ -111,30 +103,6 @@ void accept_new_connection(int server_socket, fd_set *all_sockets, int *fd_max)
 	memset(&msg_to_send, '\0', sizeof msg_to_send);
 	sprintf(msg_to_send, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
 	send(client_fd, msg_to_send, strlen(msg_to_send), 0);
-}
-
-void read_data_from_socket(int socket, fd_set *all_sockets, int fd_max, int server_socket)
-{
-	char buffer[BUFSIZ];
-	char msg_to_send[BUFSIZ];
-	int bytes_read;
-	int status;
-
-	memset(&buffer, '\0', sizeof buffer);
-	bytes_read = recv(socket, buffer, BUFSIZ, 0);
-	if (bytes_read <= 0)
-	{
-		if (bytes_read == 0)
-			printf("[%d] Client socket closed connection.\n", socket);
-		close(socket);
-		FD_CLR(socket, all_sockets);
-	}
-	else
-	{
-		memset(&msg_to_send, '\0', sizeof msg_to_send);
-		sprintf(msg_to_send, "<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server:READ_DATA</h1>\n</body>\n</html>");
-		for (int j = 0; j <= fd_max; j++)
-			if (FD_ISSET(j, all_sockets) && j != server_socket && j != socket)
-				send(j, msg_to_send, strlen(msg_to_send), 0);
-	}
+	close(client_fd);
+	FD_CLR(client_fd, all_sockets);
 }

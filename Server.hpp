@@ -11,32 +11,34 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <Config.hpp>
 #define BUFSIZ 1024
 #define CONFIG_FILE "./conf/default.conf"
 
 class Server
 {
-	struct sockaddr_in	_sa;
-	std::string			_ip;
-	unsigned short		_port;
-	int 				_server_socket;
-	fd_set				_all_sockets;
-	fd_set				_read_fds;
-	char				_request_msg[BUFSIZ];
-	char				_responce_nsg[BUFSIZ];
-	struct timeval		_timer;
+		struct sockaddr_in	_sa;
+		std::string			_ip;
+		unsigned short		_port;
+		int 				_server_socket;
+		fd_set				_all_sockets;
+		fd_set				_read_fds;
+		char				_request_msg[BUFSIZ];
+		char				_responce_msg[BUFSIZ];
+		struct timeval		_timer;
+		Config&				_cfg;
 	public:
-	Server(std::string ip, unsigned short port);
-	~Server();
-	void socket_create();
-	void accept_connection();
+		Server(const Config &cfg); //accept and store Config class object where stored all configuratins data
+		~Server();
+		void socket_create();
+		void accept_connection();
 
 	class Socket_error:public std::exception {
-		std::string _what;
+			std::string _what;
 		public:
-		Socket_error(std::string what);
-		virtual const char* what() const throw();
-		virtual ~Socket_error() _NOEXCEPT;
+			Socket_error(std::string what);
+			virtual const char* what() const throw();
+			virtual ~Socket_error() _NOEXCEPT;
 	};
 };
 
@@ -66,7 +68,6 @@ void Server::socket_create()
 	std::cout << "[Server] Listening on port " << _port << "\n";
 	if (listen(_server_socket, 10) != 0)
 		throw Socket_error(std::string("[Server] Listen error: ") + strerror(errno));
-
 	FD_ZERO(&_all_sockets);
 	FD_ZERO(&_read_fds);
 	FD_SET(_server_socket, &_all_sockets);
@@ -83,9 +84,9 @@ void Server::accept_connection()
 	if (client_fd > fd_max)
 		fd_max = client_fd;
 	std::cout << "[Server] Accepted new connection on client socket " << client_fd << ".\n";
-	memset(&_responce_nsg, '\0', sizeof _responce_nsg);
-	sprintf(_responce_nsg, "Welcome. You are client fd [%d]\n", client_fd);
-	if (send(client_fd, _responce_nsg, strlen(_responce_nsg), 0) == -1)
+	memset(&_responce_msg, '\0', sizeof _responce_msg);
+	sprintf(_responce_msg, "Welcome. You are client fd [%d]\n", client_fd);
+	if (send(client_fd, _responce_msg, strlen(_responce_msg), 0) == -1)
 		throw Socket_error(std::string("[Server] Send error to client ") + "client_fd" + ": " + strerror(errno));
 
 }
@@ -93,46 +94,46 @@ void Server::accept_connection()
 void Server::make_response(int i)
 {
 	std::cout << "[" << i << "] Got message: " << _request_msg << "\n";
-	memset(&_responce_nsg, '\0', sizeof _responce_nsg);
-	sprintf(_responce_nsg, "[%d] says: %s", i, _request_msg);
-	for (int j = 0; j <= fd_max; j++) {
-		if (FD_ISSET(j, &_all_sockets) && j != _server_socket && j != i) {
-			if (send(j, _responce_nsg, strlen(_responce_nsg), 0) == -1)
+	memset(&_responce_msg, '\0', sizeof _responce_msg);
+	sprintf(_responce_msg, "[%d] says: %s", i, _request_msg);
+	for (int j = 0; j <= fd_max; j++)
+	{
+		if (FD_ISSET(j, &_all_sockets) && j != _server_socket && j != i)
+		{
+			if (send(j, _responce_msg, strlen(_responce_msg), 0) == -1)
 				fprintf(stderr, "[Server] Send error to client fd %d: %s\n", j, strerror(errno));
 		}
 	}
 }
 
-Server::Server(std::string ip, unsigned short port): _ip(ip), _port(port)
+Server::Server(const Config &cgf): _conf(cfg)
 {
-	std::cout << "---- SERVER ----\n\n";
+	create();
+	
 
+	/////
 	socket_create();
 	int fd_max = _server_socket;
 
-	_timer.tv_sec = 2;
-	_timer.tv_usec = 0;
-	while (1) {
+	while (1)
+	{
 		_read_fds = _all_sockets;
-		int status = select(fd_max + 1, &_read_fds, NULL, NULL, &_timer);
-		if (status == -1) {
-			fprintf(stderr, "[Server] Select error: %s\n", strerror(errno));
+		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
+		if (status == -1)
 			exit(1);
-		}
-		else if (status == 0) {
-			std::cout << "[Server] Waiting...\n";
-			continue ;
-		}
-		for (int i = 0; i <= fd_max; i++) {
+		for (int i = 0; i <= fd_max; i++)
+		{
 			if (FD_ISSET(i, &_read_fds) == 0)
 				continue ;
 			std::cout << "[" << i << "] Ready for I/O operation\n";
 			if (i == _server_socket)
 				accept_connection();
-			else {
+			else
+			{
 				memset(&_request_msg, '\0', sizeof _request_msg);
 				int bytes_read = recv(i, _request_msg, BUFSIZ, 0);
-				if (bytes_read <= 0) {
+				if (bytes_read <= 0)
+				{
 					close(i);
 					FD_CLR(i, &_all_sockets);
 					if (bytes_read == 0)
