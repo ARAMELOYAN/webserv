@@ -17,28 +17,29 @@
 
 class Server
 {
-		struct sockaddr_in	_sa;
-		std::string			_ip;
-		unsigned short		_port;
-		int 				_server_socket;
-		fd_set				_all_sockets;
-		fd_set				_read_fds;
-		char				_request_msg[BUFSIZ];
-		char				_responce_msg[BUFSIZ];
-		struct timeval		_timer;
-		Config&				_cfg;
+	struct sockaddr_in	_sa;
+	std::string			_ip;
+	unsigned short		_port;
+	int 				_server_socket;
+	fd_set				_all_sockets;
+	fd_set				_read_fds;
+	char				_request_msg[BUFSIZ];
+	char				_responce_msg[BUFSIZ];
+	struct timeval		_timer;
+	Config&				_cfg;
 	public:
-		Server(const Config &cfg); //accept and store Config class object where stored all configuratins data
-		~Server();
-		void socket_create();
-		void accept_connection();
+	Server(const Config &cfg); //accept and store Config class object where stored all configuratins data
+	~Server();
+	void socket_create();
+	void accept_connection();
+	void responce(int sock);
 
 	class Socket_error:public std::exception {
-			std::string _what;
+		std::string _what;
 		public:
-			Socket_error(std::string what);
-			virtual const char* what() const throw();
-			virtual ~Socket_error() _NOEXCEPT;
+		Socket_error(std::string what);
+		virtual const char* what() const throw();
+		virtual ~Socket_error() _NOEXCEPT;
 	};
 };
 
@@ -84,35 +85,22 @@ void Server::accept_connection()
 	if (client_fd > fd_max)
 		fd_max = client_fd;
 	std::cout << "[Server] Accepted new connection on client socket " << client_fd << ".\n";
-	memset(&_responce_msg, '\0', sizeof _responce_msg);
-	sprintf(_responce_msg, "Welcome. You are client fd [%d]\n", client_fd);
-	if (send(client_fd, _responce_msg, strlen(_responce_msg), 0) == -1)
-		throw Socket_error(std::string("[Server] Send error to client ") + "client_fd" + ": " + strerror(errno));
-
+	request(client_fd);
+	responce(client_fd);
+	close(client_fd);
+	FD_CLR(client_fd, all_sockets);
 }
 
-void Server::make_response(int i)
+void Server::responce(int sock)
 {
-	std::cout << "[" << i << "] Got message: " << _request_msg << "\n";
 	memset(&_responce_msg, '\0', sizeof _responce_msg);
-	sprintf(_responce_msg, "[%d] says: %s", i, _request_msg);
-	for (int j = 0; j <= fd_max; j++)
-	{
-		if (FD_ISSET(j, &_all_sockets) && j != _server_socket && j != i)
-		{
-			if (send(j, _responce_msg, strlen(_responce_msg), 0) == -1)
-				fprintf(stderr, "[Server] Send error to client fd %d: %s\n", j, strerror(errno));
-		}
-	}
+	sprintf(_responce_msg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
+	if (send(client_fd, _responce_msg, strlen(_responce_msg), 0) == -1)
+		throw Socket_error(std::string("[Server] Send error to client ") + "client_fd" + ": " + strerror(errno));
 }
 
 Server::Server(const Config &cgf): _conf(cfg)
 {
-	create();
-	accept(){Request(); Responce(); close();}
-	
-
-	/////
 	socket_create();
 	int fd_max = _server_socket;
 
