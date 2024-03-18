@@ -51,13 +51,8 @@ int main(void)
 		if (status == -1)
 			exit(1);
 		printf(RED"STATUS____%d\n"RESET, status);
-		for (int i = 0; i <= fd_max; i++)
-		{
-			if (FD_ISSET(i, &read_fds) == 0)
-				continue ;
-			if (i == server_socket)
-				accept_new_connection(server_socket, &all_sockets, &fd_max);
-		}
+		if (FD_ISSET(server_socket, &read_fds))
+			accept_new_connection(server_socket, &all_sockets, &fd_max);
 	}
 	return (0);
 }

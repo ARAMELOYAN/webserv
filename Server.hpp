@@ -109,6 +109,7 @@ void Server::make_response(int i)
 Server::Server(const Config &cgf): _conf(cfg)
 {
 	create();
+	accept(){Request(); Responce(); close();}
 	
 
 	/////
@@ -121,29 +122,7 @@ Server::Server(const Config &cgf): _conf(cfg)
 		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
 		if (status == -1)
 			exit(1);
-		for (int i = 0; i <= fd_max; i++)
-		{
-			if (FD_ISSET(i, &_read_fds) == 0)
-				continue ;
-			std::cout << "[" << i << "] Ready for I/O operation\n";
-			if (i == _server_socket)
-				accept_connection();
-			else
-			{
-				memset(&_request_msg, '\0', sizeof _request_msg);
-				int bytes_read = recv(i, _request_msg, BUFSIZ, 0);
-				if (bytes_read <= 0)
-				{
-					close(i);
-					FD_CLR(i, &_all_sockets);
-					if (bytes_read == 0)
-						std::cout << "[" << i << "] Client socket closed connection.\n";
-					else
-						throw Socket_error(std::string("[Server] Recv error: ") + strerror(errno));
-				}
-				else
-					make_responce(i);
-			}
-		}
+		if (FD_ISSET(_server_socket, &_read_fds))
+			accept_connection();
 	}
 }
