@@ -43,6 +43,22 @@ class Server
 	};
 };
 
+Server::Server(const Config &cgf): _conf(cfg)
+{
+	socket_create();
+	int fd_max = _server_socket;
+
+	while (1)
+	{
+		_read_fds = _all_sockets;
+		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
+		if (status == -1)
+			exit(1);
+		if (FD_ISSET(_server_socket, &_read_fds))
+			accept_connection();
+	}
+}
+
 Server::Socket_error::Socket_error(std::string what):_what(what)
 {
 }
@@ -97,20 +113,4 @@ void Server::responce(int sock)
 	sprintf(_responce_msg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
 	if (send(client_fd, _responce_msg, strlen(_responce_msg), 0) == -1)
 		throw Socket_error(std::string("[Server] Send error to client ") + "client_fd" + ": " + strerror(errno));
-}
-
-Server::Server(const Config &cgf): _conf(cfg)
-{
-	socket_create();
-	int fd_max = _server_socket;
-
-	while (1)
-	{
-		_read_fds = _all_sockets;
-		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
-		if (status == -1)
-			exit(1);
-		if (FD_ISSET(_server_socket, &_read_fds))
-			accept_connection();
-	}
 }
