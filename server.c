@@ -18,13 +18,13 @@
 
 #define PORT 4242
 
-int create_server_socket(void);
+int*  create_server_socket(void);
 void accept_new_connection(int listener_socket, fd_set *all_sockets, int *fd_max);
 void read_data_from_socket(int socket, fd_set *all_sockets, int fd_max, int server_socket);
 
 int main(void)
 {
-	int server_socket;
+	int *server_socket;
 	int status;
 	fd_set all_sockets;
 	fd_set read_fds;
@@ -35,15 +35,22 @@ int main(void)
 	FD_ZERO(&read_fds);
 	printf("---- SERVER ----\n\n");
 	server_socket = create_server_socket();
-	if (server_socket == -1)
+	if (server_socket[0] == -1)
+		return (1);
+	if (server_socket[1] == -1)
 		return (1);
 	printf("[Server] Listening on port %d\n", PORT);
-	if (listen(server_socket, 10) != 0)
+	if (listen(server_socket[0], 10) != 0)
 	{
 		return (3);
 	}
-	FD_SET(server_socket, &all_sockets);
-	fd_max = server_socket;
+	if (listen(server_socket[1], 10) != 0)
+	{
+		return (3);
+	}
+	FD_SET(server_socket[0], &all_sockets);
+	FD_SET(server_socket[1], &all_sockets);
+	fd_max = server_socket[1];
 	while (1)
 	{
 		read_fds = all_sockets;
@@ -51,31 +58,49 @@ int main(void)
 		if (status == -1)
 			exit(1);
 		printf(RED"STATUS____%d\n"RESET, status);
-		if (FD_ISSET(server_socket, &read_fds))
-			accept_new_connection(server_socket, &all_sockets, &fd_max);
+		if (FD_ISSET(server_socket[0], &read_fds))
+			accept_new_connection(server_socket[0], &all_sockets, &fd_max);
+		if (FD_ISSET(server_socket[1], &read_fds))
+			accept_new_connection(server_socket[1], &all_sockets, &fd_max);
 	}
 	return (0);
 }
 
-int create_server_socket(void)
+int* create_server_socket(void)
 {
 	struct sockaddr_in sa;
-	int socket_fd;
+	struct sockaddr_in sa2;
+	int *socket_fd;
 	int status;
+	int status2;
 
+	socket_fd = (int *)malloc(sizeof(int) * 2);
 	memset(&sa, 0, sizeof sa);
 	sa.sin_family = AF_INET;
 	sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	sa.sin_port = htons(PORT);
-	socket_fd = socket(sa.sin_family, SOCK_STREAM, 0);
-	if (socket_fd == -1)
-		return (-1);
-	printf("[Server] Created server socket fd: %d\n", socket_fd);
-	status = bind(socket_fd, (struct sockaddr *)&sa, sizeof sa);
+	memset(&sa2, 0, sizeof sa2);
+	sa2.sin_family = AF_INET;
+	sa2.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	sa2.sin_port = htons(8012);
+	socket_fd[0] = socket(sa.sin_family, SOCK_STREAM, 0);
+	if (socket_fd[0] == -1)
+		return (socket_fd);
+	socket_fd[1] = socket(sa.sin_family, SOCK_STREAM, 0);
+	if (socket_fd[1] == -1)
+		return (socket_fd);
+	printf("[Server] Created server socket fd: %d\n", socket_fd[1]);
+	status = bind(socket_fd[0], (struct sockaddr *)&sa, sizeof sa);
 	if (status != 0)
 	{
 		fprintf(stderr, "[Server] Bind error: %s\n", strerror(errno));
-		return (-1);
+		return (socket_fd);
+	}
+	status2 = bind(socket_fd[1], (struct sockaddr *)&sa2, sizeof sa2);
+	if (status2 != 0)
+	{
+		fprintf(stderr, "[Server] Bind error: %s\n", strerror(errno));
+		return (socket_fd);
 	}
 	printf("[Server] Bound socket to localhost port %d\n", PORT);
 	return (socket_fd);
