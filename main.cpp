@@ -10,8 +10,10 @@ int main()
 {
 	try
 	{
-		const Config& conf = Config();
-		Server serv(conf);
+		const Config conf = Config();
+		std::vector<Config> confs;
+		confs.insert(confs.begin(), conf);
+		Server serv(*confs.begin());
 	}
 	catch (std::exception &e)
 	{
