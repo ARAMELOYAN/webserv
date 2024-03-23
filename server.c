@@ -79,6 +79,7 @@ int* create_server_socket(void)
 	sa.sin_family = AF_INET;
 	sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	sa.sin_port = htons(PORT);
+	printf("_____%u_____\n", sa.sin_addr.s_addr);
 	memset(&sa2, 0, sizeof sa2);
 	sa2.sin_family = AF_INET;
 	sa2.sin_addr.s_addr = htonl(INADDR_LOOPBACK);

@@ -3,13 +3,18 @@
 
 class Config
 {
-		struct sockaddr_in	_sa;
-		std::string			_ip;
+		unsigned int		_ip;
 		unsigned short		_port;
-		int					_server_socket;
 	public:
-		Config();
-		~Config();
+		Config()
+		{
+			_ip = INADDR_LOOPBACK;
+			_port = 8000;
+			std::cout << "CONFIG\n";
+		}
+		~Config()
+		{
+		};
+		const unsigned int get_ip() const {return _ip;}
+		const unsigned short get_port() const {return _port;}
 };
-
-const std::vector<Config> parce(const std::string& file_name);

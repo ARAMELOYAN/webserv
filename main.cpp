@@ -1,23 +1,21 @@
 #include <iostream>
-#include <Server.hpp>
-#include <Config.hpp>
+#include "Server.hpp"
+#include "Config.hpp"
 #include <vector>
-#include <signal>
 #include <sys/types.h>
 #include <sys/wait.h>
 #define CONFIG_FILE ./webserv.conf
 
 int main()
 {
-	std::vector<Config> configs = Config::parse(CONFIG_FILE);
-	std::vector<Config>::iterator conf = configs.begin();
-	while(conf != configs.end())
+	try
 	{
-		{
-			Server(*conf);
-		}
-		else
-			++conf;
+		const Config& conf = Config();
+		Server serv(conf);
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
 	}
 	return 0;
 }
