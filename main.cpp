@@ -4,6 +4,7 @@
 #include <vector>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <cstdio>
 #define CONFIG_FILE ./webserv.conf
 
 int main()
@@ -12,8 +13,8 @@ int main()
 	{
 		const Config conf = Config();
 		std::vector<Config> confs;
-		confs.insert(confs.begin(), conf);
-		Server serv(*confs.begin());
+		confs.insert(confs.end(), conf);
+		Server serv(confs);
 	}
 	catch (std::exception &e)
 	{

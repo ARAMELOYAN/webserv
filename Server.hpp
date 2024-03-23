@@ -12,22 +12,23 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <vector>
 #include "Config.hpp"
 #define BUFSIZ 1024
 
 class Server
 {
-		struct sockaddr_in	_sa;
-		int 				_server_socket;
-		int 				fd_max;
-		fd_set				_all_sockets;
-		fd_set				_read_fds;
-		char				_request_msg[BUFSIZ];
-		char				_responce_msg[BUFSIZ];
-		struct timeval		_timer;
-		const Config&		_cfg;
+		struct sockaddr_in		_sa;
+		int 					_server_socket;
+		int 					fd_max;
+		fd_set					_all_sockets;
+		fd_set					_read_fds;
+		char					_request_msg[BUFSIZ];
+		char					_responce_msg[BUFSIZ];
+		struct timeval			_timer;
+		std::vector<Config>&	_cfg;
 	public:
-		Server(const Config &cfg); //accept and store Config class object where stored all configuratins data
+		Server(std::vector<Config> &cfg); //accept and store Config class object where stored all configuratins data
 		void socket_create();
 		void accept_connection();
 		void responce(int sock);
