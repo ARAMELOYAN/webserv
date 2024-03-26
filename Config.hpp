@@ -9,12 +9,12 @@ class Config
 		Config()
 		{
 			_ip = INADDR_LOOPBACK;
-			_port = 8000;
+			_port = 4242;
 			std::cout << "CONFIG\n";
 		}
 		~Config()
 		{
 		};
-		const unsigned int get_ip() const {return _ip;}
-		const unsigned short get_port() const {return _port;}
+		unsigned int getIp() const {return _ip;}
+		unsigned short getPort() const {return _port;}
 };

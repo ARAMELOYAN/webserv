@@ -13,7 +13,9 @@
 #include <string>
 #include <exception>
 #include <vector>
+#include <map>
 #include "Config.hpp"
+#include "Request.hpp"
 #define BUFSIZ 1024
 
 class Server
@@ -27,18 +29,19 @@ class Server
 		char					_responce_msg[BUFSIZ];
 		struct timeval			_timer;
 		std::vector<Config>&	_cfg;
+		std::map<int, Request>	_client;
 	public:
-		Server(std::vector<Config> &cfg); //accept and store Config class object where stored all configuratins data
+		Server(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
 		void socket_create();
 		void accept_connection();
 		void responce(int sock);
 	
-		class Socket_error:public std::exception {
-			std::string _what;
+		class Socket_error: public std::exception {
+				std::string _what;
 			public:
-			Socket_error(std::string what);
-			virtual const char* what() const throw();
-			virtual ~Socket_error() _NOEXCEPT;
+				Socket_error(std::string what);
+				virtual const char* what() const throw();
+				virtual ~Socket_error() _NOEXCEPT;
 		};
 };
 #endif

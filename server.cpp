@@ -35,16 +35,16 @@ void Server::socket_create()
 
 	memset(&_sa, 0, sizeof _sa);
 	_sa.sin_family = AF_INET;
-	_sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	_sa.sin_port = htons(_cfg.begin()->get_port());
+	_sa.sin_addr.s_addr = htonl(_cfg.begin()->getIp());
+	_sa.sin_port = htons(_cfg.begin()->getPort());
 	_server_socket = socket(_sa.sin_family, SOCK_STREAM, 0);
 	if (_server_socket == -1)
 		throw  Socket_error(std::string("[Server] Socket error: ") + strerror(errno));
 	std::cout << "[Server] Created server socket fd: " << _server_socket << "\n";
 	if (bind(_server_socket, (struct sockaddr *)&_sa, sizeof _sa) != 0)
 		throw Socket_error(std::string("[Server] Bind error: ") + strerror(errno));
-	std::cout << "[Server] Bound socket to localhost port " << _cfg.begin()->get_port() << "\n";
-	std::cout << "[Server] Listening on port " << _cfg.begin()->get_port() << "\n";
+	std::cout << "[Server] Bound socket to localhost port " << _cfg.begin()->getPort() << "\n";
+	std::cout << "[Server] Listening on port " << _cfg.begin()->getPort() << "\n";
 	if (listen(_server_socket, 10) != 0)
 		throw Socket_error(std::string("[Server] Listen error: ") + strerror(errno));
 	FD_ZERO(&_all_sockets);
