@@ -11,7 +11,7 @@ int main()
 {
 	try
 	{
-		const Config conf = Config();
+		const Config conf = Config(8000);
 		std::vector<Config> confs;
 		confs.insert(confs.end(), conf);
 		Server serv(confs);

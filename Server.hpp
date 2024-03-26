@@ -20,7 +20,6 @@
 
 class Server
 {
-		struct sockaddr_in		_sa;
 		int 					_server_socket;
 		int 					fd_max;
 		fd_set					_all_sockets;
