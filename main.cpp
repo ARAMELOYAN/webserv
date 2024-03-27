@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Server.hpp"
+#include "Webserv.hpp"
 #include "Config.hpp"
 #include <vector>
 #include <sys/types.h>
@@ -11,10 +11,10 @@ int main()
 {
 	try
 	{
-		const Config conf = Config(8000);
-		std::vector<Config> confs;
-		confs.insert(confs.end(), conf);
-		Server serv(confs);
+		const Config serv = Config(8000);
+		std::vector<Config> servs;
+		servs.insert(servs.end(), serv);
+		Webserv http(servs);
 	}
 	catch (std::exception &e)
 	{

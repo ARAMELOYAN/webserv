@@ -18,7 +18,7 @@
 #include "Request.hpp"
 #define BUFSIZ 1024
 
-class Server
+class Webserv
 {
 		int 					_server_socket;
 		int 					fd_max;
@@ -27,10 +27,10 @@ class Server
 		char					_request_msg[BUFSIZ];
 		char					_responce_msg[BUFSIZ];
 		struct timeval			_timer;
-		std::vector<Config>&	_cfg;
+		std::vector<Config>&	_server;
 		std::map<int, Request>	_client;
 	public:
-		Server(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
+		Webserv(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
 		void socket_create();
 		void accept_connection();
 		void responce(int sock);
