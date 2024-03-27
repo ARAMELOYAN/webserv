@@ -20,7 +20,6 @@
 
 class Webserv
 {
-		int 					_server_socket;
 		int 					fd_max;
 		fd_set					_all_sockets;
 		fd_set					_read_fds;

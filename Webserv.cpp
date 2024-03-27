@@ -2,9 +2,13 @@
 
 Webserv::Webserv(std::vector<Config> &serv): _server(serv)
 {
-	std::cout << "SERVER\n";
+	FD_ZERO(&_all_sockets);
+	FD_ZERO(&_read_fds);
+	FD_SET(_server.begin()->getSockId(), &_all_sockets);
+	std::cout << "Set up select fd sets\n";
+	std::cout << "WEBSERV\n";
 	socket_create();
-	int fd_max = _server_socket;
+	int fd_max = _server.begin()->getSockId();
 
 	while (1)
 	{
@@ -12,8 +16,11 @@ Webserv::Webserv(std::vector<Config> &serv): _server(serv)
 		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
 		if (status == -1)
 			exit(1);
-		if (FD_ISSET(_server_socket, &_read_fds))
+		if (FD_ISSET(_server.begin()->getSockId(), &_read_fds))
+		{
+			std::cout << _server.begin()->getSockId() << "\n";
 			accept_connection();
+		}
 	}
 }
 
@@ -32,27 +39,11 @@ const char* Webserv::Socket_error::what() const throw()
 
 void Webserv::socket_create()
 {
-
-	_server_socket = socket(_server.begin()->getSa().sin_family, SOCK_STREAM, 0);
-	if (_server_socket == -1)
-		throw  Socket_error(std::string("[Webserv] Socket error: ") + strerror(errno));
-	std::cout << "[Webserv] Created server socket fd: " << _server_socket << "\n";
-	if (bind(_server_socket, (struct sockaddr *)&_server.begin()->getSa(), sizeof _server.begin()->getSa()) != 0)
-		throw Socket_error(std::string("[Webserv] Bind error: ") + strerror(errno));
-	std::cout << "[Webserv] Bound socket to localhost port " << _server.begin()->getPort() << "\n";
-	std::cout << "[Webserv] Listening on port " << _server.begin()->getPort() << "\n";
-	if (listen(_server_socket, 10) != 0)
-		throw Socket_error(std::string("[Webserv] Listen error: ") + strerror(errno));
-	FD_ZERO(&_all_sockets);
-	FD_ZERO(&_read_fds);
-	FD_SET(_server_socket, &_all_sockets);
-	std::cout << "[Webserv] Set up select fd sets\n";
 }
 
 void Webserv::accept_connection()
 {
-
-	int client_fd = accept(_server_socket, NULL, NULL);
+	int client_fd = accept(_server.begin()->getSockId(), NULL, NULL);
 	if (client_fd == -1)
 		throw Socket_error(std::string("[Webserv] Accept error: ") + strerror(errno));
 	FD_SET(client_fd, &_all_sockets);
