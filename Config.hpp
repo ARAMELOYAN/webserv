@@ -12,6 +12,16 @@ class Config
 			_sa.sin_family = AF_INET;
 			_sa.sin_addr.s_addr = htonl(ip);
 			_sa.sin_port = htons(port);
+			this->setSockId(socket(AF_INET, SOCK_STREAM, 0));
+			if (this->getSockId() == -1)
+				throw  Socket_error(std::string("Socket error: ") + strerror(errno));
+			std::cout << "Created this socket fd: " << this->getSockId() << "\n";
+			if (bind(this->getSockId(), (struct sockaddr *)&this->getSa(), sizeof this->getSa()) != 0)
+				throw Socket_error(std::string("Bind error: ") + strerror(errno));
+			std::cout << "Bound socket to localhost port " << this->getPort() << "\n";
+			if (listen(this->getSockId(), 10) != 0)
+				throw Socket_error(std::string("Listen error: ") + strerror(errno));
+			std::cout << "Listening on port " << this->getPort()<< "\n";
 		}
 		~Config()
 		{
@@ -21,4 +31,14 @@ class Config
 		const sockaddr_in& getSa() const	{return _sa;}
 		int getSockId() const				{return _socket;}
 		void setSockId(int fd)				{_socket = fd;}
+		class Socket_error: public std::exception {
+				std::string _what;
+			public:
+				Socket_error(std::string what):_what(what){};
+				virtual const char* what() const throw()
+				{
+					return _what.c_str();
+				}
+				virtual ~Socket_error() _NOEXCEPT {};
+		};
 };

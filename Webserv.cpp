@@ -41,21 +41,6 @@ const char* Webserv::Socket_error::what() const throw()
 
 void Webserv::socket_create()
 {
-	std::vector<Config>::iterator server = _servers.begin();
-	//while (server != _servers.end())
-	{
-		server->setSockId(socket(AF_INET, SOCK_STREAM, 0));
-		if (server->getSockId() == -1)
-			throw  Socket_error(std::string("Socket error: ") + strerror(errno));
-		std::cout << "Created server socket fd: " << server->getSockId() << "\n";
-		if (bind(server->getSockId(), (struct sockaddr *)&server->getSa(), sizeof server->getSa()) != 0)
-			throw Socket_error(std::string("Bind error: ") + strerror(errno));
-		std::cout << "Bound socket to localhost port " << server->getPort() << "\n";
-		if (listen(server->getSockId(), 10) != 0)
-			throw Socket_error(std::string("Listen error: ") + strerror(errno));
-		std::cout << "Listening on port " << server->getPort()<< "\n";
-		server++;
-	}
 }
 
 void Webserv::accept_connection()
