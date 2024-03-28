@@ -1,24 +1,25 @@
 #include "Webserv.hpp"
 
-Webserv::Webserv(std::vector<Config> &serv): _server(serv)
+Webserv::Webserv(std::vector<Config> &serv): _servers(serv)
 {
 	FD_ZERO(&_all_sockets);
 	FD_ZERO(&_read_fds);
-	FD_SET(_server.begin()->getSockId(), &_all_sockets);
+	FD_SET(_servers.begin()->getSockId(), &_all_sockets);
 	std::cout << "Set up select fd sets\n";
 	std::cout << "WEBSERV\n";
 	socket_create();
-	int fd_max = _server.begin()->getSockId();
+	int fd_max = _servers.begin()->getSockId();
 
 	while (1)
 	{
 		_read_fds = _all_sockets;
 		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
+		std::cout << "Listening on port \n";
 		if (status == -1)
 			exit(1);
-		if (FD_ISSET(_server.begin()->getSockId(), &_read_fds))
+		if (FD_ISSET(_servers.begin()->getSockId(), &_read_fds))
 		{
-			std::cout << _server.begin()->getSockId() << "\n";
+			std::cout << _servers.begin()->getSockId() << "\n";
 			accept_connection();
 		}
 	}
@@ -39,8 +40,8 @@ const char* Webserv::Socket_error::what() const throw()
 
 void Webserv::socket_create()
 {
-	std::vector<Config>::iterator server = _server.begin();
-	while (server != _server.end())
+	std::vector<Config>::iterator server = _servers.begin();
+	//while (server != _servers.end())
 	{
 		server->setSockId(socket(AF_INET, SOCK_STREAM, 0));
 		if (server->getSockId() == -1)
@@ -49,15 +50,16 @@ void Webserv::socket_create()
 		if (bind(server->getSockId(), (struct sockaddr *)&server->getSa(), sizeof server->getSa()) != 0)
 			throw Socket_error(std::string("Bind error: ") + strerror(errno));
 		std::cout << "Bound socket to localhost port " << server->getPort() << "\n";
-		std::cout << "Listening on port " << server->getPort()<< "\n";
 		if (listen(server->getSockId(), 10) != 0)
 			throw Socket_error(std::string("Listen error: ") + strerror(errno));
+		std::cout << "Listening on port " << server->getPort()<< "\n";
+		server++;
 	}
 }
 
 void Webserv::accept_connection()
 {
-	int client_fd = accept(_server.begin()->getSockId(), NULL, NULL);
+	int client_fd = accept(_servers.begin()->getSockId(), NULL, NULL);
 	if (client_fd == -1)
 		throw Socket_error(std::string("Accept error: ") + strerror(errno));
 	FD_SET(client_fd, &_all_sockets);

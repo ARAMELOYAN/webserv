@@ -26,7 +26,7 @@ class Webserv
 		char					_request_msg[BUFSIZ];
 		char					_responce_msg[BUFSIZ];
 		struct timeval			_timer;
-		std::vector<Config>&	_server;
+		std::vector<Config>&	_servers;
 		std::map<int, Request>	_client;
 	public:
 		Webserv(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
