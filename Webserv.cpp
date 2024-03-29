@@ -9,8 +9,6 @@ Webserv::Webserv(std::vector<Config> &serv): _servers(serv)
 	std::cout << "WEBSERV\n";
 	socket_create();
 	int fd_max = _servers.begin()->getSockId();
-	std::cout << fd_max << "\n";
-
 	while (1)
 	{
 		_read_fds = _all_sockets;
