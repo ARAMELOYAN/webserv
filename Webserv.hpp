@@ -20,7 +20,7 @@
 
 class Webserv
 {
-		int 					fd_max;
+		int 					_fd_max;
 		fd_set					_all_sockets;
 		fd_set					_read_fds;
 		char					_request_msg[BUFSIZ];
@@ -31,7 +31,7 @@ class Webserv
 	public:
 		Webserv(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
 		void socket_create();
-		void accept_connection();
+		void accept_connection(int fd);
 		void responce(int sock);
 	
 		class Socket_error: public std::exception {

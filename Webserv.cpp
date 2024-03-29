@@ -2,24 +2,33 @@
 
 Webserv::Webserv(std::vector<Config> &serv): _servers(serv)
 {
+	_fd_max = 0;
 	FD_ZERO(&_all_sockets);
 	FD_ZERO(&_read_fds);
-	FD_SET(_servers.begin()->getSockId(), &_all_sockets);
-	std::cout << "Set up select fd sets\n";
 	std::cout << "WEBSERV\n";
-	socket_create();
-	int fd_max = _servers.begin()->getSockId();
+	std::vector<Config>::iterator it = _servers.begin();
+	while (it != _servers.end())
+	{
+		if (_fd_max < it->getSockId())
+			_fd_max = it->getSockId();
+		FD_SET(_fd_max, &_all_sockets);
+		it++;
+	}
 	while (1)
 	{
 		_read_fds = _all_sockets;
-		int status = select(fd_max + 1, &_read_fds, NULL, NULL, NULL);
-		std::cout << "Listening on port \n";
+		int status = select(_fd_max + 1, &_read_fds, NULL, NULL, NULL);
 		if (status == -1)
 			exit(1);
-		if (FD_ISSET(_servers.begin()->getSockId(), &_read_fds))
+		it = _servers.begin();
+		while (it != _servers.end())
 		{
-			std::cout << _servers.begin()->getSockId() << "\n";
-			accept_connection();
+			if (FD_ISSET(it->getSockId(), &_read_fds))
+			{
+				std::cout << it->getSockId() << "\n";
+				accept_connection(it->getSockId());
+			}
+			it++;
 		}
 	}
 }
@@ -41,14 +50,14 @@ void Webserv::socket_create()
 {
 }
 
-void Webserv::accept_connection()
+void Webserv::accept_connection(int fd)
 {
-	int client_fd = accept(_servers.begin()->getSockId(), NULL, NULL);
+	int client_fd = accept(fd, NULL, NULL);
 	if (client_fd == -1)
 		throw Socket_error(std::string("Accept error: ") + strerror(errno));
 	FD_SET(client_fd, &_all_sockets);
-	if (client_fd > fd_max)
-		fd_max = client_fd;
+	if (client_fd > _fd_max)
+		_fd_max = client_fd;
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
 	//request(client_fd);
 	responce(client_fd);
