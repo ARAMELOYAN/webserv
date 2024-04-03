@@ -50,6 +50,13 @@ void Webserv::socket_create()
 {
 }
 
+void Webserv::request(int sockId)
+{
+	while (read(sockId, _requestMsg, BUFSIZ) > 0)
+		std::cout << _requestMsg;
+	std::cout << "HELLO\n";
+}
+
 void Webserv::accept_connection(int fd)
 {
 	int client_fd = accept(fd, NULL, NULL);
@@ -59,7 +66,7 @@ void Webserv::accept_connection(int fd)
 	if (client_fd > _fd_max)
 		_fd_max = client_fd;
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
-	//request(client_fd);
+	request(client_fd);
 	responce(client_fd);
 	close(client_fd);
 	FD_CLR(client_fd, &_all_sockets);
@@ -67,8 +74,8 @@ void Webserv::accept_connection(int fd)
 
 void Webserv::responce(int sock)
 {
-	memset(&_responce_msg, '\0', sizeof _responce_msg);
-	sprintf(_responce_msg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
-	if (send(sock, _responce_msg, strlen(_responce_msg), 0) == -1)
+	memset(&_responceMsg, '\0', sizeof _responceMsg);
+	sprintf(_responceMsg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
+	if (send(sock, _responceMsg, strlen(_responceMsg), 0) == -1)
 		throw Socket_error(std::string("Send error to client ") + "client_fd" + ": " + strerror(errno));
 }

@@ -23,8 +23,8 @@ class Webserv
 		int 					_fd_max;
 		fd_set					_all_sockets;
 		fd_set					_read_fds;
-		char					_request_msg[BUFSIZ];
-		char					_responce_msg[BUFSIZ];
+		char					_requestMsg[BUFSIZ];
+		char					_responceMsg[BUFSIZ];
 		struct timeval			_timer;
 		std::vector<Config>&	_servers;
 		std::map<int, Request>	_client;
@@ -32,6 +32,7 @@ class Webserv
 		Webserv(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
 		void socket_create();
 		void accept_connection(int fd);
+		void request(int sock);
 		void responce(int sock);
 	
 		class Socket_error: public std::exception {
