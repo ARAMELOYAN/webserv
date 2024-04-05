@@ -53,13 +53,14 @@ void Webserv::socket_create()
 void Webserv::request(int client_fd)
 {
 	memset(&_requestMsg, 0, sizeof _requestMsg);
-	if (recv(client_fd, _requestMsg, 512, 0) == -1)
+	if (recv(client_fd, _requestMsg, 64, 0) == -1)
 		return ;
 	_client[client_fd].append(_requestMsg);
 }
 
 void Webserv::accept_connection(int fd)
 {
+	std::cout << fd << "\n";
 	int client_fd = accept(fd, NULL, NULL);
 	if (client_fd == -1)
 		throw Socket_error(std::string("Accept error: ") + strerror(errno));
@@ -70,8 +71,8 @@ void Webserv::accept_connection(int fd)
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
 	request(client_fd);
 	responce(client_fd);
-	close(client_fd);
-	FD_CLR(client_fd, &_all_sockets);
+	//close(client_fd);
+	//FD_CLR(client_fd, &_all_sockets);
 }
 
 void Webserv::responce(int sock)

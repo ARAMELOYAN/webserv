@@ -25,6 +25,8 @@ class Config
 		}
 		~Config()
 		{
+			close(_socket);
+			std::cout << _socket << " Server closed\n";
 		};
 		unsigned int getIp() const			{return ntohl(_sa.sin_addr.s_addr);}
 		unsigned short getPort() const		{return ntohs(_sa.sin_port);}

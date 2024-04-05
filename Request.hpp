@@ -6,12 +6,12 @@ class Request{
 	public:
 		Request()
 		{
-			std::cout << "Request\n";
 		}
 
 		void append(const char* str)
 		{
 			_request.append(str);
+			std::cout << _request << "\n\n";
 		}
 
 		~Request()

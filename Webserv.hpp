@@ -1,22 +1,22 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
-#include <errno.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <cstdlib>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <iostream>
-#include <string>
-#include <exception>
-#include <vector>
-#include <map>
-#include "Config.hpp"
-#include "Request.hpp"
-#define BUFSIZ 1024
+# include <errno.h>
+# include <unistd.h>
+# include <netdb.h>
+# include <stdio.h>
+# include <cstdlib>
+# include <sys/select.h>
+# include <sys/types.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <iostream>
+# include <string>
+# include <exception>
+# include <vector>
+# include <map>
+# include "Config.hpp"
+# include "Request.hpp"
+# define BUFSIZ 1024
 
 class Webserv
 {
