@@ -50,13 +50,12 @@ void Webserv::socket_create()
 {
 }
 
-void Webserv::request(int sockId)
+void Webserv::request(int client_fd)
 {
-	if (read(sockId, _requestMsg, BUFSIZ) == -1)
-
-		std::cout << _requestMsg;
-	responce(sockId);
-	std::cout << "HELLO\n";
+	memset(&_requestMsg, 0, sizeof _requestMsg);
+	if (recv(client_fd, _requestMsg, 512, 0) == -1)
+		return ;
+	_client[client_fd].append(_requestMsg);
 }
 
 void Webserv::accept_connection(int fd)
@@ -67,8 +66,10 @@ void Webserv::accept_connection(int fd)
 	FD_SET(client_fd, &_all_sockets);
 	if (client_fd > _fd_max)
 		_fd_max = client_fd;
+	_client[client_fd] = Request();
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
 	request(client_fd);
+	responce(client_fd);
 	close(client_fd);
 	FD_CLR(client_fd, &_all_sockets);
 }
