@@ -26,10 +26,11 @@ class Webserv
 		char					_requestMsg[BUFSIZ];
 		char					_responceMsg[BUFSIZ];
 		struct timeval			_timer;
-		std::vector<Config>&	_servers;
+		std::vector<Config *>&	_servers;
 		std::map<int, Request>	_client;
 	public:
-		Webserv(std::vector<Config> &cfg); //accept and store Config class object where stored all configurations data
+		Webserv(std::vector<Config *> &cfg); //accept and store Config class object where stored all configurations data
+		~Webserv();
 		void socket_create();
 		void accept_connection(int fd);
 		void request(int sock);

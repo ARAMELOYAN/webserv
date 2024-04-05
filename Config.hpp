@@ -28,6 +28,12 @@ class Config
 			close(_socket);
 			std::cout << _socket << " Server closed\n";
 		};
+		Config(const Config& cnf)
+		{
+			_socket = cnf._socket;
+			_sa = cnf._sa;
+			std::cout << "Config copy constructor\n";
+		}
 		unsigned int getIp() const			{return ntohl(_sa.sin_addr.s_addr);}
 		unsigned short getPort() const		{return ntohs(_sa.sin_port);}
 		const sockaddr_in& getSa() const	{return _sa;}

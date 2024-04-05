@@ -1,12 +1,16 @@
 #include "Webserv.hpp"
 
-Webserv::Webserv(std::vector<Config> &serv): _servers(serv)
+Webserv::~Webserv()
+{
+	std::cout << "\e[0;31mWebserv closed\e0m\n";
+}
+Webserv::Webserv(std::vector<Config *> &serv): _servers(serv)
 {
 	_fd_max = 0;
 	FD_ZERO(&_all_sockets);
 	FD_ZERO(&_read_fds);
 	std::cout << "WEBSERV\n";
-	std::vector<Config>::iterator it = _servers.begin();
+	std::vector<Config *>::iterator it = _servers.begin();
 	while (it != _servers.end())
 	{
 		if (_fd_max < it->getSockId())
@@ -28,6 +32,8 @@ Webserv::Webserv(std::vector<Config> &serv): _servers(serv)
 				std::cout << it->getSockId() << "\n";
 				accept_connection(it->getSockId());
 			}
+			else
+				responce(it->getSockId());
 			it++;
 		}
 	}
@@ -60,7 +66,6 @@ void Webserv::request(int client_fd)
 
 void Webserv::accept_connection(int fd)
 {
-	std::cout << fd << "\n";
 	int client_fd = accept(fd, NULL, NULL);
 	if (client_fd == -1)
 		throw Socket_error(std::string("Accept error: ") + strerror(errno));
@@ -70,7 +75,9 @@ void Webserv::accept_connection(int fd)
 	_client[client_fd] = Request();
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
 	request(client_fd);
+	std::cout << "\e[0;32mHello1\e[0m\n";
 	responce(client_fd);
+	std::cout << "\e[0;32mHello2\e[0m\n";
 	//close(client_fd);
 	//FD_CLR(client_fd, &_all_sockets);
 }

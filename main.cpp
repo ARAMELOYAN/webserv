@@ -13,9 +13,9 @@ int main()
 	{
 		const Config serv = Config(4242);
 	//	const Config serv1 = Config(8080);
-		std::vector<Config> servs;
-		servs.push_back(serv);
-	//	servs.push_back(serv1);
+		std::vector<Config *> servs;
+		servs.push_back(&serv);
+	//	servs.push_back(&serv1);
 		Webserv http(servs);
 	}
 	catch (std::exception &e)
