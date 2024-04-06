@@ -20,16 +20,16 @@
 
 class Webserv
 {
-		int 					_fd_max;
-		fd_set					_all_sockets;
-		fd_set					_read_fds;
-		char					_requestMsg[BUFSIZ];
-		char					_responceMsg[BUFSIZ];
-		struct timeval			_timer;
-		std::vector<Config *>&	_servers;
-		std::map<int, Request>	_client;
+		int 							_fd_max;
+		fd_set							_all_sockets;
+		fd_set							_read_fds;
+		char							_requestMsg[BUFSIZ];
+		char							_responceMsg[BUFSIZ];
+		struct timeval					_timer;
+		std::vector<const Config *>&	_servers;
+		std::map<int, Request>			_client;
 	public:
-		Webserv(std::vector<Config *> &cfg); //accept and store Config class object where stored all configurations data
+		Webserv(std::vector<const Config *> &cfg); //accept and store Config class object where stored all configurations data
 		~Webserv();
 		void socket_create();
 		void accept_connection(int fd);

@@ -4,17 +4,17 @@ Webserv::~Webserv()
 {
 	std::cout << "\e[0;31mWebserv closed\e0m\n";
 }
-Webserv::Webserv(std::vector<Config *> &serv): _servers(serv)
+Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 {
 	_fd_max = 0;
 	FD_ZERO(&_all_sockets);
 	FD_ZERO(&_read_fds);
 	std::cout << "WEBSERV\n";
-	std::vector<Config *>::iterator it = _servers.begin();
+	std::vector<const Config *>::iterator it = _servers.begin();
 	while (it != _servers.end())
 	{
-		if (_fd_max < it->getSockId())
-			_fd_max = it->getSockId();
+		if (_fd_max < (*it)->getSockId())
+			_fd_max = (*it)->getSockId();
 		FD_SET(_fd_max, &_all_sockets);
 		it++;
 	}
@@ -27,13 +27,11 @@ Webserv::Webserv(std::vector<Config *> &serv): _servers(serv)
 		it = _servers.begin();
 		while (it != _servers.end())
 		{
-			if (FD_ISSET(it->getSockId(), &_read_fds))
+			if (FD_ISSET((*it)->getSockId(), &_read_fds))
 			{
-				std::cout << it->getSockId() << "\n";
-				accept_connection(it->getSockId());
+				std::cout << (*it)->getSockId() << "\n";
+				accept_connection((*it)->getSockId());
 			}
-			else
-				responce(it->getSockId());
 			it++;
 		}
 	}
