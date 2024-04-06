@@ -23,6 +23,7 @@ class Webserv
 		int 							_fd_max;
 		fd_set							_all_sockets;
 		fd_set							_read_fds;
+		fd_set							_write_fds;
 		char							_requestMsg[BUFSIZ];
 		char							_responceMsg[BUFSIZ];
 		struct timeval					_timer;

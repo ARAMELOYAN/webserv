@@ -21,17 +21,14 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 	while (1)
 	{
 		_read_fds = _all_sockets;
-		int status = select(_fd_max + 1, &_read_fds, NULL, NULL, NULL);
+		int status = select(_fd_max + 1, &_read_fds, &_write_fds, NULL, NULL);
 		if (status == -1)
 			exit(1);
 		it = _servers.begin();
 		while (it != _servers.end())
 		{
 			if (FD_ISSET((*it)->getSockId(), &_read_fds))
-			{
-				std::cout << (*it)->getSockId() << "\n";
 				accept_connection((*it)->getSockId());
-			}
 			it++;
 		}
 	}
@@ -72,12 +69,6 @@ void Webserv::accept_connection(int fd)
 		_fd_max = client_fd;
 	_client[client_fd] = Request();
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
-	request(client_fd);
-	std::cout << "\e[0;32mHello1\e[0m\n";
-	responce(client_fd);
-	std::cout << "\e[0;32mHello2\e[0m\n";
-	//close(client_fd);
-	//FD_CLR(client_fd, &_all_sockets);
 }
 
 void Webserv::responce(int sock)

@@ -15,7 +15,7 @@ class Config
 			this->setSockId(socket(AF_INET, SOCK_STREAM, 0));
 			if (this->getSockId() == -1)
 				throw  Socket_error(std::string("Socket error: ") + strerror(errno));
-			std::cout << "Created this socket fd: " << this->getSockId() << "\n";
+			std::cout << "Socket created fd: " << this->getSockId() << "\n";
 			if (bind(this->getSockId(), (struct sockaddr *)&this->getSa(), sizeof this->getSa()) != 0)
 				throw Socket_error(std::string("Bind error: ") + strerror(errno));
 			std::cout << "Bound socket to localhost port " << this->getPort() << "\n";
