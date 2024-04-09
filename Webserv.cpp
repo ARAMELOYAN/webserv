@@ -4,6 +4,7 @@ Webserv::~Webserv()
 {
 	std::cout << "\e[0;31mWebserv closed\e0m\n";
 }
+
 Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 {
 	_fd_max = 0;
@@ -11,6 +12,7 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 	FD_ZERO(&_read_fds);
 	std::cout << "WEBSERV\n";
 	std::vector<const Config *>::iterator it = _servers.begin();
+	std::map<int, Request>::iterator client_it = _client.begin();
 	while (it != _servers.end())
 	{
 		if (_fd_max < (*it)->getSockId())
@@ -30,6 +32,15 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 			if (FD_ISSET((*it)->getSockId(), &_read_fds))
 				accept_connection((*it)->getSockId());
 			it++;
+			std::cout << "\e[0;32mHello\e[0m\n";
+		}
+		client_it = _client.begin();
+		std::cout << "\e[0;31mHello\e[0m\n";
+		while (client_it != _client.end())
+		{
+			if (FD_ISSET(client_it->first, &_read_fds))
+				request(client_it->first);
+			client_it++;
 		}
 	}
 }
@@ -54,8 +65,12 @@ void Webserv::socket_create()
 void Webserv::request(int client_fd)
 {
 	memset(&_requestMsg, 0, sizeof _requestMsg);
-	if (recv(client_fd, _requestMsg, 64, 0) == -1)
+	if (recv(client_fd, _requestMsg, 64, 0) <= 0)
+	{
+		close(client_fd);
+		FD_CLR(client_fd, &_all_sockets);
 		return ;
+	}
 	_client[client_fd].append(_requestMsg);
 }
 
