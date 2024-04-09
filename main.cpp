@@ -11,11 +11,11 @@ int main()
 {
 	try
 	{
-		const Config serv = Config(4242);
-	//	const Config serv1 = Config(8080);
+		const Config serv = Config(3000);
+		const Config serv1 = Config(8080);
 		std::vector<const Config *> servs;
 		servs.push_back(&serv);
-	//	servs.push_back(&serv1);
+		servs.push_back(&serv1);
 		Webserv http(servs);
 	}
 	catch (std::exception &e)

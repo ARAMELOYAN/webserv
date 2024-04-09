@@ -32,14 +32,20 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 			if (FD_ISSET((*it)->getSockId(), &_read_fds))
 				accept_connection((*it)->getSockId());
 			it++;
-			std::cout << "\e[0;32mHello\e[0m\n";
 		}
 		client_it = _client.begin();
-		std::cout << "\e[0;31mHello\e[0m\n";
 		while (client_it != _client.end())
 		{
 			if (FD_ISSET(client_it->first, &_read_fds))
 				request(client_it->first);
+			client_it++;
+		}
+		client_it = _client.begin();
+		while (client_it != _client.end())
+		{
+			std::cout << "\e[0;32m" << "Hello" << "\e[0m\n";
+			if (FD_ISSET(client_it->first, &_write_fds))
+				responce(client_it->first);
 			client_it++;
 		}
 	}
@@ -65,12 +71,14 @@ void Webserv::socket_create()
 void Webserv::request(int client_fd)
 {
 	memset(&_requestMsg, 0, sizeof _requestMsg);
-	if (recv(client_fd, _requestMsg, 64, 0) <= 0)
+	if (recv(client_fd, _requestMsg, 1024, 0) <= 0)
 	{
+
 		close(client_fd);
 		FD_CLR(client_fd, &_all_sockets);
 		return ;
 	}
+	std::cout << "\e[0;32m" << strlen(_requestMsg) << "\e[0m\n";
 	_client[client_fd].append(_requestMsg);
 }
 
