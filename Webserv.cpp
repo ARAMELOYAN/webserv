@@ -71,7 +71,7 @@ void Webserv::socket_create()
 void Webserv::request(int client_fd)
 {
 	memset(&_requestMsg, 0, sizeof _requestMsg);
-	if (recv(client_fd, _requestMsg, 1024, 0) <= 0)
+	if (recv(client_fd, _requestMsg, BUFSIZ, 0) <= 0)
 	{
 
 		close(client_fd);
@@ -80,6 +80,8 @@ void Webserv::request(int client_fd)
 	}
 	std::cout << "\e[0;32m" << strlen(_requestMsg) << "\e[0m\n";
 	_client[client_fd].append(_requestMsg);
+	if (strlen(_requestMsg) < BUFSIZ)
+		FD_SET(client_fd, &_write_fds);
 }
 
 void Webserv::accept_connection(int fd)
