@@ -36,10 +36,10 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 		client_it = _client.begin();
 		while (client_it != _client.end())
 		{
-			if (FD_ISSET(client_it->first, &_read_fds))
-				request(client_it->first);
-			else if (FD_ISSET(client_it->first, &_write_fds))
+			if (FD_ISSET(client_it->first, &_write_fds))
 				responce(client_it->first);
+			else if (FD_ISSET(client_it->first, &_read_fds))
+				request(client_it->first);
 			client_it++;
 		}
 	}
