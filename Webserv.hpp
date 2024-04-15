@@ -14,9 +14,10 @@
 # include <exception>
 # include <vector>
 # include <map>
+# include <cstring>
 # include "Config.hpp"
 # include "Request.hpp"
-# define BUFSIZ 1024
+# define BUFSIZE 1024
 
 class Webserv
 {
@@ -42,7 +43,8 @@ class Webserv
 			public:
 				Socket_error(std::string what);
 				virtual const char* what() const throw();
-				virtual ~Socket_error() _NOEXCEPT;
+				//virtual ~Socket_error() _NOEXCEPT;
+				virtual ~Socket_error(); // linux
 		};
 };
 #endif

@@ -38,13 +38,7 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 		{
 			if (FD_ISSET(client_it->first, &_read_fds))
 				request(client_it->first);
-			client_it++;
-		}
-		client_it = _client.begin();
-		while (client_it != _client.end())
-		{
-			std::cout << "\e[0;32m" << "Hello" << "\e[0m\n";
-			if (FD_ISSET(client_it->first, &_write_fds))
+			else if (FD_ISSET(client_it->first, &_write_fds))
 				responce(client_it->first);
 			client_it++;
 		}
@@ -73,9 +67,9 @@ void Webserv::request(int client_fd)
 	memset(&_requestMsg, 0, sizeof _requestMsg);
 	if (recv(client_fd, _requestMsg, BUFSIZ, 0) <= 0)
 	{
-
 		close(client_fd);
 		FD_CLR(client_fd, &_all_sockets);
+		_client.erase(client_fd);
 		return ;
 	}
 	std::cout << "\e[0;32m" << strlen(_requestMsg) << "\e[0m\n";
@@ -94,12 +88,16 @@ void Webserv::accept_connection(int fd)
 		_fd_max = client_fd;
 	_client[client_fd] = Request();
 	std::cout << "Accepted new connection on client socket " << client_fd << ".\n";
+	memset(&_responceMsg, '\0', sizeof _responceMsg);
+	sprintf(_responceMsg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>\r\n\r\n");
+	if (send(client_fd, _responceMsg, strlen(_responceMsg), 0) == -1)
+		throw Socket_error(std::string("Send error to client ") + "client_fd" + ": " + strerror(errno));
 }
 
 void Webserv::responce(int sock)
 {
 	memset(&_responceMsg, '\0', sizeof _responceMsg);
-	sprintf(_responceMsg, "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1234\nConnection: close\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>");
+	sprintf(_responceMsg, "<!DOCTYPE html>\n<html>\n<head>\n<title>HELLO HTML</title>\n</head>\n<body>\n<h1>Hello Html from my server</h1>\n</body>\n</html>\r\n\r\n");
 	if (send(sock, _responceMsg, strlen(_responceMsg), 0) == -1)
 		throw Socket_error(std::string("Send error to client ") + "client_fd" + ": " + strerror(errno));
 }

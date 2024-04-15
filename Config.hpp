@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <fcntl.h>
 
 class Config
 {
@@ -12,6 +13,9 @@ class Config
 			_sa.sin_family = AF_INET;
 			_sa.sin_addr.s_addr = htonl(ip);
 			_sa.sin_port = htons(port);
+			int flags = fcntl(_socket, F_GETFL, 0);
+			if (fcntl(_socket, F_SETFL, flags | O_NONBLOCK) == -1)
+				throw  Socket_error(std::string("fcntl error: ") + strerror(errno));
 			this->setSockId(socket(AF_INET, SOCK_STREAM, 0));
 			if (this->getSockId() == -1)
 				throw  Socket_error(std::string("Socket error: ") + strerror(errno));
@@ -47,6 +51,7 @@ class Config
 				{
 					return _what.c_str();
 				}
-				virtual ~Socket_error() _NOEXCEPT {};
+				//virtual ~Socket_error() _NOEXCEPT {};
+				virtual ~Socket_error() {}; // linux
 		};
 };
