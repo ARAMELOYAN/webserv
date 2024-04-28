@@ -38,7 +38,7 @@ Webserv::Webserv(std::vector<const Config *> &serv): _servers(serv)
 		{
 			if (FD_ISSET(client_it->first, &_write_fds))
 				responce(client_it->first);
-			else if (FD_ISSET(client_it->first, &_read_fds))
+			if (FD_ISSET(client_it->first, &_read_fds))
 				request(client_it->first);
 			client_it++;
 		}
@@ -66,6 +66,7 @@ void Webserv::request(int client_fd)
 {
 	memset(&_requestMsg, 0, sizeof _requestMsg);
 	if (recv(client_fd, _requestMsg, BUFSIZ, 0) <= 0)
+		
 	{
 		close(client_fd);
 		FD_CLR(client_fd, &_all_sockets);
