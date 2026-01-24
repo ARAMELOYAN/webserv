@@ -79,7 +79,8 @@ server {
     }
 }
 ```
-Supported directives may include:
+
+## Supported directives may include:
 
 listen
 
@@ -97,21 +98,21 @@ methods
 
 autoindex
 
-🚀 Build & Run
+## 🚀 Build & Run
 Build
 make
 Run
 ./webserv config/default.conf
 If no config file is provided, a default configuration is used.
 
-🌐 Usage
+## 🌐 Usage
 Once running, access the server via browser or curl:
 
 curl http://localhost:8080
 Test POST upload:
 
 curl -X POST -F "file=@test.txt" http://localhost:8080/upload
-🧪 Testing
+## 🧪 Testing
 The server can be tested using:
 
 Browser (Chrome / Firefox)
@@ -132,18 +133,18 @@ Large file uploads
 
 Incorrect configurations
 
-⚠️ Constraints (42 rules)
-❌ No external libraries (except standard C/C++)
+# ⚠️ Constraints (42 rules)
+# ❌ No external libraries (except standard C/C++)
 
-❌ No fork-based server model
+# ❌ No fork-based server model
 
-❌ No blocking I/O
+# ❌ No blocking I/O
 
-✅ One event loop
+# ✅ One event loop
 
-✅ Must never block on a single client
+# ✅ Must never block on a single client
 
-🧠 What This Project Teaches
+## 🧠 What This Project Teaches
 Low-level networking
 
 Event-driven architecture
