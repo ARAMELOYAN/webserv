@@ -79,7 +79,7 @@ server {
 }
 
 
-```conf
+```
 Supported directives may include:
 
 listen
