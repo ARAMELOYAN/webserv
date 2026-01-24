@@ -97,12 +97,8 @@ autoindex
 
 🚀 Build & Run
 Build
-bash
-Copy code
 make
 Run
-bash
-Copy code
 ./webserv config/default.conf
 If no config file is provided, a default configuration is used.
 
