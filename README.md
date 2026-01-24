@@ -133,18 +133,18 @@ Large file uploads
 
 Incorrect configurations
 
-# ⚠️ Constraints (42 rules)
-# ❌ No external libraries (except standard C/C++)
+### ⚠️ Constraints (42 rules)
+### ❌ No external libraries (except standard C/C++)
 
-# ❌ No fork-based server model
+### ❌ No fork-based server model
 
-# ❌ No blocking I/O
+### ❌ No blocking I/O
 
-# ✅ One event loop
+### ✅ One event loop
 
-# ✅ Must never block on a single client
+### ✅ Must never block on a single client
 
-## 🧠 What This Project Teaches
+### 🧠 What This Project Teaches
 Low-level networking
 
 Event-driven architecture
