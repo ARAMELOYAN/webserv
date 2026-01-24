@@ -77,8 +77,6 @@ server {
         upload_dir uploads;
     }
 }
-
-
 ```
 Supported directives may include:
 
