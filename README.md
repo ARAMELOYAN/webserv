@@ -47,6 +47,7 @@ This project focuses heavily on **network programming**, **system calls**, and *
 
 > (adjust if needed)
 
+```conf
 .
 ├── srcs/ # server implementation
 ├── includes/ # headers
@@ -54,7 +55,7 @@ This project focuses heavily on **network programming**, **system calls**, and *
 ├── www/ # static website root
 ├── Makefile
 └── README.md
-
+```
 
 ---
 
